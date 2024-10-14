@@ -20,21 +20,6 @@
   let userDriveID = "";
   let folderDriveID = "";
 
-
-  function showAlert(status) {
-    console.log("Status received:", status); // Debugging: check if the status is being passed
-    if (status === 'success') {
-      alert('Email Verified Successfully!');
-    } else if (status === 'invalid') {
-      alert('Invalid or Expired Token!');
-    } else if (status === 'expired') {
-      alert('Token has expired. Please request a new verification email.');
-    } else {
-      console.log("No status or unknown status.");
-    }
-  }
-
-
   // JavaScript Validation
   document.getElementById('loginForm').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent default form submission

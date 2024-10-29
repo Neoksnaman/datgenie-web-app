@@ -1136,7 +1136,7 @@ function convertToDATFormat_P(data, noncreditableInputTax) {
     
       // Remove spaces and special characters, then trim to 9 characters in excel TIN column
       if (index === 0) {
-      cell = cell.replace(/\W/g, '').substring(0, 9);
+      cell = String(cell).replace(/\W/g, '').substring(0, 9);
       }
 
       // Ensure number values in 8th to 13th columns have 2 decimal places

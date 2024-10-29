@@ -1030,6 +1030,7 @@ function processVatPurchases(json, header) {
   updateInputTaxTotal();
 
   document.getElementById("inputTaxbutton").onclick = function() {
+  try {
     var noncreditableInputTax = document.getElementById("noncreditableInputTax").value;
     var result = convertToDATFormat_P(sortedJson, noncreditableInputTax);
     var datContent = result.datContent;
@@ -1038,6 +1039,10 @@ function processVatPurchases(json, header) {
     showPreview_P(datContent, total, noncreditableInputTax, datfile_fileName);
     document.getElementById("noncreditablemodal").style.display = "none";
     document.getElementById("noncreditableInputTax").value = '';
+    } catch (error) {
+    console.error('Error processing files:', error);
+    alert('Error processing files: ' + error);
+    }
   };
 }
 

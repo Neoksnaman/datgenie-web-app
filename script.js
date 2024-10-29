@@ -1122,16 +1122,16 @@ function convertToDATFormat_P(data, noncreditableInputTax) {
       if (typeof cell === 'string') {
 
       // Convert to uppercase
-      cell = cell.toUpperCase();
+      cell = String(cell).toUpperCase();
 
       // Remove special characters, replace "&" with "AND", and replace "Ñ" with "N"
-      cell = cell.replace(/\s\s+/g, ' ').replace(/&/g, "AND").replace(/Ñ/g, "N").replace(/[^\w\s]|_/g, "");
+      cell = String(cell).replace(/\s\s+/g, ' ').replace(/&/g, "AND").replace(/Ñ/g, "N").replace(/[^\w\s]|_/g, "");
 
       // Remove leading and trailing spaces
-      cell = cell.trim();
+      cell = String(cell).trim();
 
       // Replace linebreak character with space character
-      cell = cell.replace(/\r?\n|\r/g, ' ');
+      cell = String(cell).replace(/\r?\n|\r/g, ' ');
       }
     
       // Remove spaces and special characters, then trim to 9 characters in excel TIN column

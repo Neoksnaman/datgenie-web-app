@@ -849,18 +849,18 @@ function convertToDATFormat_S(data) {
       cell = cell.toUpperCase();
 
       // Remove special characters, replace "&" with "AND", and replace "Ñ" with "N"
-      cell = cell.replace(/\s\s+/g, ' ').replace(/&/g, "AND").replace(/Ñ/g, "N").replace(/[^\w\s]|_/g, "");
+      cell = String(cell).replace(/\s\s+/g, ' ').replace(/&/g, "AND").replace(/Ñ/g, "N").replace(/[^\w\s]|_/g, "");
 
       // Remove leading and trailing spaces
       cell = cell.trim();
 
       // Replace linebreak character with space character
-      cell = cell.replace(/\r?\n|\r/g, ' ');
+      cell = String(cell).replace(/\r?\n|\r/g, ' ');
       }
     
       // Remove spaces and special characters, then trim to 9 characters in excel TIN column
       if (index === 0) {
-      cell = cell.replace(/\W/g, '').substring(0, 9);
+      cell = String(cell).replace(/\W/g, '').substring(0, 9);
       }
     
       // Ensure number values in 8th to 11th columns have 2 decimal places
@@ -3071,15 +3071,15 @@ function convertToDATFormat_QAPF1(data) {
           // Convert to uppercase
           cell = cell.toUpperCase();
           // Remove special characters, replace "&" with "AND", and replace "Ñ" with "N"
-          cell = cell.replace(/\s\s+/g, ' ').replace(/&/g, "AND").replace(/Ñ/g, "N").replace(/[^\w\s]|_/g, "");
+          cell = String(cell).replace(/\s\s+/g, ' ').replace(/&/g, "AND").replace(/Ñ/g, "N").replace(/[^\w\s]|_/g, "");
           // Remove leading and trailing spaces
           cell = cell.trim();
           // Replace linebreak character with space character
-          cell = cell.replace(/\r?\n|\r/g, ' ');
+          cell = String(cell).replace(/\r?\n|\r/g, ' ');
         }
         // Remove spaces and special characters, then trim to 9 characters in excel TIN column
         if (index === 3) { // Adjusted to account for unshift
-          cell = cell.replace(/\W/g, '').substring(0, 9);
+          cell = String(cell).replace(/\W/g, '').substring(0, 9);
         }
 
         // Ensure number values in 9th to 10th columns have 2 decimal places
@@ -3328,15 +3328,15 @@ function convertToDATFormat_SAWT(data, selectedSAWT) {
           // Convert to uppercase
           cell = cell.toUpperCase();
           // Remove special characters, replace "&" with "AND", and replace "Ñ" with "N"
-          cell = cell.replace(/\s\s+/g, ' ').replace(/&/g, "AND").replace(/Ñ/g, "N").replace(/[^\w\s]|_/g, "");
+          cell = String(cell).replace(/\s\s+/g, ' ').replace(/&/g, "AND").replace(/Ñ/g, "N").replace(/[^\w\s]|_/g, "");
           // Remove leading and trailing spaces
           cell = cell.trim();
           // Replace linebreak character with space character
-          cell = cell.replace(/\r?\n|\r/g, ' ');
+          cell = String(cell).replace(/\r?\n|\r/g, ' ');
         }
         // Remove spaces and special characters, then trim to 9 characters in excel TIN column
         if (index === 3) { // Adjusted to account for unshift
-          cell = cell.replace(/\W/g, '').substring(0, 9);
+          cell = String(cell).replace(/\W/g, '').substring(0, 9);
         }
 
         // Ensure number values in 9th to 10th columns have 2 decimal places

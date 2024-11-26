@@ -5561,35 +5561,26 @@ async function processFiles_2307() {
             form.getTextField('SignatoryTIN').setText(signatoryTIN);
 
             data.headers.forEach((header, index) => {
-    if (header === 'PayeeTIN' && typeof row[index] === 'string') {
-        let payeeTIN = row[index].replace(/[^0-9a-zA-Z]/g, '').substring(0, 9);
+                if (header === 'PayeeTIN' && typeof row[index] === 'string') {
+                    console.log(`Processing PayeeTIN: ${row[index]}`);
+                    let payeeTIN = row[index].replace(/[^0-9a-zA-Z]/g, '').substring(0, 9);
 
-        if (payeeTIN.length === 9) {
-            // Check if the fields exist before setting them
-            if (form.getTextField('PayeeTIN1') && form.getTextField('PayeeTIN2') && form.getTextField('PayeeTIN3')) {
-                form.getTextField('PayeeTIN1').setText(payeeTIN.slice(0, 3));
-                form.getTextField('PayeeTIN2').setText(payeeTIN.slice(3, 6));
-                form.getTextField('PayeeTIN3').setText(payeeTIN.slice(6, 9));
-            } else {
-                console.warn('One or more PayeeTIN fields (PayeeTIN1, PayeeTIN2, PayeeTIN3) are missing in the form.');
-            }
-        } else {
-            console.warn(`Invalid PayeeTIN value: ${row[index]}`);
-        }
-    } else {
-        const field = form.getTextField(header);
-        if (field) {
-            let value = row[index] || ''; // Default to empty string if undefined or null
-            if (index >= 10 && index <= 14 && typeof value === 'number') {
-                value = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
-            }
-            field.setText(value.toString());
-        } else {
-            console.warn(`Field "${header}" is missing in the PDF form.`);
-        }
-    }
-});
-
+                    if (payeeTIN.length === 9) {
+                        form.getTextField('PayeeTIN1').setText(payeeTIN.slice(0, 3));
+                        form.getTextField('PayeeTIN2').setText(payeeTIN.slice(3, 6));
+                        form.getTextField('PayeeTIN3').setText(payeeTIN.slice(6, 9));
+                    }
+                } else {
+                    const field = form.getTextField(header);
+                    if (field) {
+                        let value = row[index];
+                        if (index >= 10 && index <= 14 && typeof value === 'number') {
+                            value = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+                        }
+                        field.setText(value !== undefined ? value.toString() : '');
+                    }
+                }
+            });
 
             form.flatten();
             return pdfDoc.save();

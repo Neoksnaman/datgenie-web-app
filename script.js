@@ -5561,13 +5561,20 @@ async function processFiles_2307() {
             form.getTextField('SignatoryTIN').setText(signatoryTIN);
 
             data.headers.forEach((header, index) => {
-                if (header === 'PayeeTIN' && typeof row[index] === 'string') {
-                    let payeeTIN = row[index].replace(/[^0-9a-zA-Z]/g, '').substring(0, 9);
-
+                if (header === 'PayeeTIN') {
+                    console.log(`Processing PayeeTIN: ${row[index]}`);
+                    let payeeTIN = row[index]?.replace(/[^0-9a-zA-Z]/g, '').substring(0, 9) || '';
+            
                     if (payeeTIN.length === 9) {
-                        form.getTextField('PayeeTIN1').setText(payeeTIN.slice(0, 3));
-                        form.getTextField('PayeeTIN2').setText(payeeTIN.slice(3, 6));
-                        form.getTextField('PayeeTIN3').setText(payeeTIN.slice(6, 9));
+                        if (form.getTextField('PayeeTIN1') && form.getTextField('PayeeTIN2') && form.getTextField('PayeeTIN3')) {
+                            form.getTextField('PayeeTIN1').setText(payeeTIN.slice(0, 3));
+                            form.getTextField('PayeeTIN2').setText(payeeTIN.slice(3, 6));
+                            form.getTextField('PayeeTIN3').setText(payeeTIN.slice(6, 9));
+                        } else {
+                            console.warn('One or more PayeeTIN fields are missing in the form.');
+                        }
+                    } else {
+                        console.warn(`Invalid PayeeTIN value: ${row[index]}`);
                     }
                 } else {
                     const field = form.getTextField(header);

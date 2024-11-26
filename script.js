@@ -5628,6 +5628,148 @@ async function fetchPdfTemplate_2307() {
   });
 }
 
+//-----------------------------------------------2306 Forms-----------------------------------------------------------
+async function processFiles_2306() {
+    const excelFile = document.getElementById('fileUpload_2306').files[0];
+    const signatureFile = document.getElementById('signatorySignature').files[0]; // Image file
+
+    if (!excelFile) {
+        alert('Please upload the Excel file.');
+        return;
+    }
+
+    // Ensure final_tpTIN is defined or provided as a parameter
+    if (typeof final_tpTIN === 'undefined' || final_tpTIN === '') {
+        alert('Please update taxpayer details.');
+        return; // Stop further processing
+    }
+
+    if (signatureFile && !validateFileSize(signatureFile, 100)) {
+        alert('The signature file exceeds 100KB. Please select a smaller file.');
+        return;
+    }
+
+    const payorTIN1 = final_tpTIN.slice(0, 3);
+    const payorTIN2 = final_tpTIN.slice(3, 6);
+    const payorTIN3 = final_tpTIN.slice(6, 9);
+    const payorAddress = `${final_subStreet ? final_subStreet + ' ' : ''}${final_street} ${final_barangay} ${final_cityMunicipality} ${final_province}`;
+
+    const signatoryName = document.getElementById('signatoryName').value;
+    const signatoryTIN = document.getElementById('signatoryTIN').value;
+    const signatoryPosition = document.getElementById('signatoryPosition').value;
+
+    try {
+        // Show loading modal
+        document.getElementById("loadingPopup").style.display = "block";
+
+        const [data, pdfTemplateBytes] = await Promise.all([
+            readExcelFile_2306(excelFile),
+            fetchPdfTemplate_2306()
+        ]);
+
+        const pdfDocs = await Promise.all(data.rows.map(async (row) => {
+            const pdfDoc = await PDFLib.PDFDocument.load(pdfTemplateBytes);
+            const form = pdfDoc.getForm();
+
+            if (signatureFile) {
+                const signatureBytes = await signatureFile.arrayBuffer();
+                const signatureImage = await pdfDoc.embedPng(signatureBytes);
+                const pages = pdfDoc.getPages();
+                const firstPage = pages[0];
+                const { width, height } = firstPage.getSize();
+
+                // Define the position and size of the signature
+                const x = 100; // x-coordinate of the signature
+                const y = 500; // y-coordinate of the signature
+                const signatureWidth = 50; // width of the signature
+                const signatureHeight = signatureWidth * (signatureImage.height / signatureImage.width); // height of the signature maintaining aspect ratio
+
+                firstPage.drawImage(signatureImage, {
+                    x: x,
+                    y: height - y - signatureHeight,
+                    width: signatureWidth,
+                    height: signatureHeight,
+                });
+            }
+
+            // Set fixed values for Payor fields
+            form.getTextField('PayorTIN1').setText(payorTIN1);
+            form.getTextField('PayorTIN2').setText(payorTIN2);
+            form.getTextField('PayorTIN3').setText(payorTIN3);
+            form.getTextField('PayorBranchCode').setText(final_branchCode.padStart(5, '0'));
+            form.getTextField('PayorName').setText(final_companyName || `${final_lastName}, ${final_firstName} ${final_middleName}`);
+            form.getTextField('PayorAddress').setText(payorAddress);
+            form.getTextField('PayorZipCode').setText(final_zipCode);
+            form.getTextField('SignatoryName').setText(signatoryName);
+            form.getTextField('SignatoryPosition').setText(signatoryPosition);
+            form.getTextField('SignatoryTIN').setText(signatoryTIN);
+
+            data.headers.forEach((header, index) => {
+                if (header === 'PayeeTIN' && typeof row[index] === 'string') {
+                    let payeeTIN = row[index].replace(/[^0-9a-zA-Z]/g, '').substring(0, 9);
+
+                    if (payeeTIN.length === 9) {
+                        form.getTextField('PayeeTIN1').setText(payeeTIN.slice(0, 3));
+                        form.getTextField('PayeeTIN2').setText(payeeTIN.slice(3, 6));
+                        form.getTextField('PayeeTIN3').setText(payeeTIN.slice(6, 9));
+                    }
+                } else {
+                    const field = form.getTextField(header);
+                    if (field) {
+                        let value = row[index];
+                        if (index >= 10 && index <= 11 && typeof value === 'number') {
+                            value = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+                        }
+                        field.setText(value !== undefined ? value.toString() : '');
+                    }
+                }
+            });
+
+            form.flatten();
+            return pdfDoc.save();
+        }));
+
+        const mergedPdf = await mergePdfs(pdfDocs);
+        download(mergedPdf, 'merged_2306.pdf', 'application/pdf');
+    } catch (error) {
+        console.error('Error processing files:', error);
+        alert('Error processing files: ' + error);
+    } finally {
+        document.getElementById("loadingPopup").style.display = "none";
+    }
+}
+
+async function readExcelFile_2306(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const data = new Uint8Array(event.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+      if (workbook.SheetNames[0] !== 'form_2306'){
+        alert('The first sheet name of the Excel file is not "form_2306".');
+        document.getElementById("loadingPopup").style.display = "none";
+        return;
+      }
+
+      resolve({ headers: json[0], rows: json.slice(1) });
+    };
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+async function fetchPdfTemplate_2306() {
+  return new Promise((resolve, reject) => {
+    google.script.run.withSuccessHandler((data) => {
+      const buffer = new Uint8Array(data);
+      resolve(buffer.buffer);
+    }).withFailureHandler(reject).getPdfTemplate_2306();
+  });
+}
+
 //-----------------------------------------------2316 Forms-----------------------------------------------------------
 async function processFiles_2316() {
     const excelFile = document.getElementById('fileUpload_2316').files[0];
